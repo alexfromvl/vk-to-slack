@@ -1,12 +1,12 @@
-from slacker import Slacker 
+from slacker import Slacker #импорт модуля для работы с API Slack
 
-import vk_api
+import vk_api #импорт модуля для работы с API Вконтакте
 
-slack = Slacker('<API TOKEN>')
+slack = Slacker('<API TOKEN>') #записываем токен от Slack bot
 
 def main():
     
-    login, password = 'email@email.ru', 'pass'
+    login, password = 'email@email.ru', 'pass' #авторизуемся в ВК
     vk_session = vk_api.VkApi(login, password)
 
     try:
