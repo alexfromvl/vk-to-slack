@@ -1,6 +1,12 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from slacker import Slacker
 import vk_api
 import time
+
+#setting
+DEBUG = True
 
 slack = Slacker('Your token API Slack')
 login_vk = 'your login VK'
@@ -32,11 +38,13 @@ def main():
             time.sleep(5) #ожидание 5 секунд
             response = vk.wall.getComments(owner_id=man_id, post_id=a, count=1, sort='desc', offset=0)
             bts = str(response['items'][0]['date'])
-            print('новых комментариев нет ' + ts + bts) #Если новых комментариев нет выводим сообщение и время
+            if DEBUG:
+                print('новых комментариев нет ' + ts + bts) #Если новых комментариев нет выводим сообщение и время
             time.sleep(5) #если время у комментариев разное цикл прекращается
         response = vk.wall.getComments(owner_id=man_id, post_id=a, count=1, sort='desc', offset=0)  # получаем комментарий со стены
         b = response['items'][0]['text'] #вытаскиваем из него только текст
-        print(b)
+        if DEBUG:
+            print(b)
         slack.chat.post_message('#vk', 'Новый комментарий: ' + b) #отправляем сообщение с текстом в Slack и повторяем цикл
 
 if __name__ == '__main__':
