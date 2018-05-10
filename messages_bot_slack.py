@@ -16,9 +16,13 @@ DEBUG = True
 slack = Slacker('Your token API Slack')
 login = 'your login VK'
 password = 'your pass VK'
-group_id = '-1234567890'
+vk_token = 'Your token API VK group'
 
 def main():
+
+    if DEBUG:
+        print("Start work!")
+
     session = requests.Session()
 
     # Авторизация пользователя:
@@ -36,53 +40,27 @@ def main():
     """
     vk_session = vk_api.VkApi(token='токен с доступом к сообщениям и фото')
     """
+    vk_session = vk_api.VkApi(token=vk_token)
 
     vk = vk_session.get_api()
 
-    upload = VkUpload(vk_session)  # Для загрузки изображений
     longpoll = VkLongPoll(vk_session)
 
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
-            print('id{}: "{}"'.format(event.user_id, event.text), end=' ')
+            # Отправка в Slack чат (#vk) - должен быть заранее создан у вас в Slack
+            slack.chat.post_message('#vk', 'Новое сообщение: id{}: "{}"'.format(event.user_id, event.text))
+            if DEBUG:
+                print('id{}: "{}"'.format(event.user_id, event.text), end=' ')
 
-            response = session.get(
-                'http://api.duckduckgo.com/',
-                params={
-                    'q': event.text,
-                    'format': 'json'
-                }
-            ).json()
-
-            text = response.get('AbstractText')
-            image_url = response.get('Image')
-
-            if not text:
-                vk.messages.send(
-                    user_id=event.user_id,
-                    message='No results'
-                )
-                print('no results')
-                continue
-
-            attachments = []
-
-            if image_url:
-                image = session.get(image_url, stream=True)
-                photo = upload.photo_messages(photos=image.raw)[0]
-
-                attachments.append(
-                    'photo{}_{}'.format(photo['owner_id'], photo['id'])
-                )
-
+            # Ответ пользователю на сообщение в ВК.
             vk.messages.send(
                 user_id=event.user_id,
-                attachment=','.join(attachments),
-                message=text
+                message="Мы получили ваше сообщение. В ближайшее время мы ответим вам."
             )
-            print('ok')
+            if DEBUG:
+                print('ok')
 
 
 if __name__ == '__main__':
     main()
-
