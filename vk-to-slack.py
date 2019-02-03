@@ -12,6 +12,7 @@ slack = Slacker('Your token API Slack')
 login_vk = 'your login VK'
 pass_vk = 'your pass VK'
 group_id = '-1234567890'
+slack_chat = '#vk'
 
 def main():
     login, password = login_vk, pass_vk
@@ -30,8 +31,7 @@ def main():
         postidlist = vk.wall.get(owner_id=man_id, count=1, offset=0) #получаем последний пост
         a = str(postidlist['items'][0]['id']) #получаем id поста в виде цифры и записываем
         time.sleep(5) #засыпаем на 5 секунд
-        ts = 10
-        bts = 10
+        ts = bts = 10
         while ts == bts: #сравниваем два числа времени комментариев, цикл выполняется до тех пор, пока цифры равны.
             response = vk.wall.getComments(owner_id=man_id, post_id=a, count=1, sort='desc', offset=0) #Получаем последний комментарий
             ts = str(response['items'][0]['date']) #запрашиваем время комментария
@@ -45,7 +45,7 @@ def main():
         b = response['items'][0]['text'] #вытаскиваем из него только текст
         if DEBUG:
             print(b)
-        slack.chat.post_message('#vk', 'Новый комментарий: ' + b) #отправляем сообщение с текстом в Slack и повторяем цикл
+        slack.chat.post_message(slack_chat, 'New comment: ' + b) #отправляем сообщение с текстом в Slack и повторяем цикл
 
 if __name__ == '__main__':
     main()
